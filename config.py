@@ -8,7 +8,7 @@ CONFIG = {
     'box_gap': 9,          # relative gap between box lists
 
     # Parameters
-    'seed': 0,             # map of the game
+    'seed': 500,             # map of the game
     'num_players': 150,    # number of players generated in each step
     'checkpoint_freq': 5   # the frequency of saving generations
 }

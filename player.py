@@ -90,23 +90,57 @@ class Player():
 
         layer_sizes = None
         if mode == 'gravity':
-            layer_sizes = [6, 20, 1]
+            layer_sizes = [5, 20, 1]
         elif mode == 'helicopter':
-            layer_sizes = [6, 20, 1]
+            layer_sizes = [5, 20, 1]
         elif mode == 'thrust':
-            layer_sizes = [6, 20, 1]
+            layer_sizes = [2, 20, 1]
         return layer_sizes
 
     
     def think(self, mode, box_lists, agent_position, velocity):
-
-        # TODO
-        # mode example: 'helicopter'
-        # box_lists: an array of `BoxList` objects
-        # agent_position example: [600, 250]
-        # velocity example: 7
-
         direction = -1
+        if mode == 'helicopter':
+            inputLayer = np.zeros((5, 1))
+            inputLayer[0, 0] = velocity / 10
+            inputLayer[1, 0] = agent_position[1] / CONFIG["HEIGHT"]
+            if len(box_lists) >= 2:
+                inputLayer[2, 0] = (agent_position[1] - box_lists[0].gap_mid) / CONFIG["HEIGHT"]
+                inputLayer[3, 0] = (agent_position[1] - box_lists[1].gap_mid) / CONFIG["HEIGHT"]
+                inputLayer[4, 0] = (box_lists[0].x - agent_position[0]) / CONFIG["WIDTH"]
+
+            result = self.nn.forward(inputLayer)[0]
+            if result > 0.5:
+                direction = 1
+            else:
+                direction = -1
+        elif mode == 'gravity':
+            inputLayer = np.zeros((5, 1))
+            inputLayer[0, 0] = velocity / 10
+            inputLayer[1, 0] = agent_position[1] / CONFIG["HEIGHT"]
+            if len(box_lists) >= 2:
+                inputLayer[2, 0] = (agent_position[1] - box_lists[0].gap_mid) / CONFIG["HEIGHT"]
+                inputLayer[3, 0] = (agent_position[1] - box_lists[1].gap_mid) / CONFIG["HEIGHT"]
+                inputLayer[4, 0] = (box_lists[0].x - agent_position[0]) / CONFIG["WIDTH"]
+
+            result = self.nn.forward(inputLayer)[0]
+            if result > 0.5:
+                direction = 1
+            else:
+                direction = -1
+        elif mode == 'thrust':
+            inputLayer = np.zeros((2, 1))
+            inputLayer[0, 0] = velocity
+            if len(box_lists) >= 1:
+                inputLayer[1, 0] = (agent_position[1] - box_lists[0].gap_mid) / CONFIG["HEIGHT"]
+
+            result = self.nn.forward(inputLayer)[0]
+            if result > 0.6:
+                direction = 1
+            elif result < 0.3:
+                direction = -1
+            else:
+                direction = 0
         return direction
 
     def collision_detection(self, mode, box_lists, camera):
@@ -131,3 +165,4 @@ class Player():
                     is_collided = True
 
         return is_collided
+ 

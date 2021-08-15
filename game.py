@@ -2,6 +2,7 @@ import pygame
 import time
 import random
 import argparse
+import numpy as np
 
 from player import Player
 from box_list import BoxList
@@ -136,7 +137,7 @@ class Game():
                         prev_delta_xs[i] = self.camera
                         prev_alive[i] = False
                         num_alive -= 1
-
+                        
             # end of episode
             if num_alive == 0:
 
